@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#8B7BA0">
+  <title>Logik üben – Kidsneed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --s-1:8px;--s-2:16px;--s-3:24px;--s-4:32px;
+      --radius-sm:12px;--radius-md:16px;--radius-lg:24px;--radius-xl:28px;
+      --shadow-soft:0 2px 10px rgba(45,42,38,.10);--shadow-subtle:0 1px 3px rgba(45,42,38,.06);
+      --bg-canvas:#F5F0E8;--bg-card:#FFFFFF;--bg-muted:#EDE8DC;
+      --ink-primary:#2D2A26;--ink-secondary:#6B665C;--ink-light:#9C9588;
+      --accent:#8B7BA0;--accent-light:rgba(139,123,160,.12);--accent-dark:#6B5B80;
+      --color-success:#7BA08A;--color-success-bg:rgba(123,160,138,.15);
+      --color-error:#C4726C;--color-error-bg:rgba(196,114,108,.15);
+      --color-warn:#D4A574;--color-warn-bg:rgba(212,165,116,.15);
+      --text-2xl:24px;--text-xl:20px;--text-lg:18px;--text-md:16px;--text-sm:14px;--text-xs:12px;
+      --motion-fast:150ms;--ease-out:cubic-bezier(0.33,1,0.68,1);
+      --app-max-w:560px;--font:'Nunito',system-ui,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg-canvas);color:var(--ink-primary);font-family:var(--font);font-weight:600;font-size:var(--text-md);line-height:1.5;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    *:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:var(--radius-sm)}
+    @media(prefers-reduced-motion:reduce){*{transition-duration:0.01ms!important;animation-duration:0.01ms!important}}
+    .app-frame{width:100%;height:100%;background:var(--bg-card);display:flex;flex-direction:column;overflow:hidden;position:relative}
+    @media(min-width:520px){body{padding:var(--s-3)}.app-frame{max-width:var(--app-max-w);height:94dvh;max-height:920px;border:3px solid var(--ink-primary);border-radius:var(--radius-lg);box-shadow:var(--shadow-subtle)}}
+    header{height:72px;padding:0 var(--s-3);display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);border-bottom:3px solid var(--ink-primary);background:var(--bg-card);flex:0 0 auto}
+    .brand{display:flex;flex-direction:column;gap:2px}.brand-title{font-size:var(--text-xl);font-weight:900;letter-spacing:-0.02em;line-height:1.1}.brand-subtitle{font-size:var(--text-xs);font-weight:900;text-transform:uppercase;letter-spacing:.10em;color:var(--ink-secondary)}
+    .header-stats{display:flex;gap:var(--s-1);align-items:center}
+    .pill{min-height:48px;padding:10px 12px;border-radius:var(--radius-sm);border:2px solid var(--ink-primary);background:var(--bg-muted);display:flex;align-items:center;gap:6px;cursor:pointer;transition:transform var(--motion-fast) var(--ease-out)}.pill:hover{box-shadow:var(--shadow-soft);transform:translateY(-1px)}.pill:active{transform:scale(0.98)}.pill .icon{font-size:16px}.pill .val{font-weight:900;font-size:var(--text-sm);font-variant-numeric:tabular-nums}
+    .viewport{flex:1;overflow-y:auto;padding:var(--s-3);background:radial-gradient(1200px 340px at 50% 0%,rgba(139,123,160,.08),transparent 60%),var(--bg-card);overscroll-behavior:contain}
+    .card{border:3px solid var(--ink-primary);border-radius:var(--radius-lg);background:var(--bg-card);box-shadow:var(--shadow-subtle);margin-bottom:var(--s-3)}.card-section{padding:var(--s-3)}.card-section+.card-section{border-top:3px solid var(--ink-primary)}
+    .section-label{font-size:var(--text-xs);font-weight:900;text-transform:uppercase;letter-spacing:.10em;color:var(--ink-secondary);margin-bottom:var(--s-2)}
+    .controls-row{display:flex;gap:var(--s-2);flex-wrap:wrap}.control-group{flex:1;min-width:120px}.control-group label{display:block;font-size:var(--text-xs);font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-secondary);margin-bottom:var(--s-1)}
+    select{width:100%;min-height:48px;padding:12px 14px;border-radius:var(--radius-sm);border:2px solid var(--ink-primary);background:var(--bg-muted);font-family:var(--font);font-weight:900;font-size:var(--text-sm);color:var(--ink-primary);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232D2A26' d='M6 8L2 4h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .grade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-1)}.grade-btn{min-height:52px;border-radius:var(--radius-sm);border:2px solid var(--ink-primary);background:var(--bg-muted);font-family:var(--font);font-weight:900;font-size:var(--text-lg);color:var(--ink-primary);cursor:pointer;transition:transform var(--motion-fast) var(--ease-out)}.grade-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-soft)}.grade-btn:active{transform:scale(0.98)}.grade-btn.selected{background:var(--accent);color:white;border-color:var(--accent-dark)}
+    .task-area{background:var(--bg-muted);border:3px solid var(--ink-primary);border-radius:var(--radius-md);padding:var(--s-3);min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-2)}.task-label{font-size:var(--text-xs);font-weight:900;text-transform:uppercase;letter-spacing:.10em;color:var(--accent)}.task-text{font-size:clamp(1rem,4vw,1.25rem);font-weight:800;text-align:center;line-height:1.5;color:var(--ink-primary);white-space:pre-wrap}
+    .pattern-row{display:flex;gap:var(--s-1);align-items:center;justify-content:center;flex-wrap:wrap;margin:var(--s-2) 0}
+    .pattern-cell{width:44px;height:44px;border:2px solid var(--ink-primary);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;background:var(--bg-card)}.pattern-cell.large{width:56px;height:56px;font-size:24px}.pattern-cell.question{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-size:24px}
+    .matrix-grid{display:grid;gap:2px;background:var(--ink-primary);border:2px solid var(--ink-primary);border-radius:var(--radius-sm);padding:2px}.matrix-cell{width:32px;height:32px;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:16px}
+    .logic-card{background:var(--bg-card);border:2px solid var(--ink-primary);border-radius:var(--radius-sm);padding:var(--s-2);margin:var(--s-1) 0;text-align:left;font-size:var(--text-sm)}.logic-card.premise{border-left:4px solid var(--accent)}.logic-card.conclusion{border-left:4px solid var(--color-warn);background:var(--color-warn-bg)}
+    .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-2);margin-top:var(--s-3)}.answers.single-col{grid-template-columns:1fr}.answers.three-col{grid-template-columns:repeat(3,1fr)}
+    .answer-btn{padding:var(--s-2) var(--s-3);border:3px solid var(--ink-primary);border-radius:var(--radius-md);background:var(--bg-card);font-family:var(--font);font-size:var(--text-md);font-weight:900;color:var(--ink-primary);cursor:pointer;transition:transform var(--motion-fast) var(--ease-out);min-height:56px;display:flex;align-items:center;justify-content:center;text-align:center}.answer-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft);background:var(--accent-light)}.answer-btn:active{transform:scale(0.98)}.answer-btn.correct{background:var(--color-success);border-color:var(--color-success);color:white}.answer-btn.incorrect{background:var(--color-error);border-color:var(--color-error);color:white}.answer-btn:disabled{cursor:not-allowed;opacity:.7}
+    .feedback{margin-top:var(--s-3);padding:var(--s-2);border-radius:var(--radius-sm);border:2px solid var(--ink-primary);background:var(--bg-muted);font-weight:800;font-size:var(--text-sm);color:var(--ink-secondary);display:flex;align-items:flex-start;gap:10px}.feedback .ficon{font-size:18px;flex-shrink:0}.feedback.success{background:var(--color-success-bg);border-color:var(--color-success);color:#2D5A3A}.feedback.error{background:var(--color-error-bg);border-color:var(--color-error);color:#6B3A32}
+    .history-dots{display:flex;gap:6px;margin-top:var(--s-2);justify-content:center;flex-wrap:wrap}.dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink-primary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}.dot.correct{background:var(--color-success-bg);border-color:var(--color-success);color:var(--color-success)}.dot.incorrect{background:var(--color-error-bg);border-color:var(--color-error);color:var(--color-error)}
+    .btn{min-height:52px;padding:14px 18px;border-radius:var(--radius-sm);border:2px solid var(--ink-primary);background:var(--bg-card);color:var(--ink-secondary);font-family:var(--font);font-weight:900;font-size:var(--text-md);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform var(--motion-fast) var(--ease-out);text-decoration:none}.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-soft)}.btn:active{transform:translateY(1px)}.btn.primary{background:var(--accent);color:white;border-color:var(--accent-dark)}.btn.primary:hover{filter:brightness(1.05)}.btn:disabled{opacity:.4;cursor:not-allowed}
+    .actions{display:flex;gap:var(--s-2);margin-top:var(--s-3)}.actions .btn{flex:1}
+    footer{flex:0 0 auto;padding:var(--s-2) var(--s-3);padding-bottom:max(var(--s-2),env(safe-area-inset-bottom));background:var(--bg-card);border-top:3px solid var(--ink-primary);display:flex;gap:var(--s-2)}footer .btn{flex:1}
+    .overlay{position:absolute;inset:0;background:rgba(0,0,0,.26);display:none;align-items:flex-end;justify-content:center;padding:var(--s-3);z-index:100}.overlay.open{display:flex}
+    .sheet{width:100%;max-width:560px;max-height:85vh;overflow-y:auto;border:3px solid var(--ink-primary);border-radius:var(--radius-xl);background:var(--bg-card);box-shadow:var(--shadow-soft);padding:var(--s-3);animation:slideUp var(--motion-fast) var(--ease-out)}.sheet h2{margin:0 0 var(--s-1);font-size:var(--text-xl);font-weight:900;text-align:center}.sheet>p{margin:0 0 var(--s-3);color:var(--ink-secondary);font-weight:800;font-size:var(--text-sm);text-align:center}.sheet-actions{display:flex;gap:var(--s-2);margin-top:var(--s-3)}.sheet-actions .btn{flex:1}
+    .settings-group{background:var(--bg-muted);border:2px solid var(--ink-primary);border-radius:var(--radius-md);overflow:hidden}.setting-row{display:flex;justify-content:space-between;align-items:center;padding:var(--s-2);min-height:56px}.setting-row+.setting-row{border-top:2px solid var(--ink-primary)}.setting-label{font-weight:900;font-size:var(--text-sm);color:var(--ink-primary)}
+    .toggle{width:52px;height:32px;background:var(--bg-canvas);border:2px solid var(--ink-primary);border-radius:16px;position:relative;cursor:pointer}.toggle::after{content:'';position:absolute;width:24px;height:24px;background:var(--bg-card);border:2px solid var(--ink-primary);border-radius:12px;top:2px;left:2px;transition:left var(--motion-fast)}.toggle.on{background:var(--color-success);border-color:var(--color-success)}.toggle.on::after{left:22px;border-color:var(--color-success)}
+    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-2);margin-bottom:var(--s-3)}.stat-card{background:var(--bg-muted);border:2px solid var(--ink-primary);border-radius:var(--radius-md);padding:var(--s-2);text-align:center}.stat-card-value{font-size:var(--text-2xl);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}.stat-card-label{font-size:var(--text-xs);font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-secondary);margin-top:4px}
+    .explain-box{background:var(--bg-muted);border:2px solid var(--ink-primary);border-radius:var(--radius-md);padding:var(--s-3)}.explain-title{font-weight:900;font-size:var(--text-sm);color:var(--accent);margin-bottom:var(--s-2)}.explain-result{background:var(--accent);color:white;padding:var(--s-2);border-radius:var(--radius-md);text-align:center;font-weight:900;font-size:var(--text-lg);margin-top:var(--s-2)}
+    .round-progress{margin-bottom:var(--s-2);padding:var(--s-2);background:var(--bg-muted);border:2px solid var(--ink-primary);border-radius:var(--radius-sm)}.round-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s-1)}.round-label{font-size:var(--text-xs);font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-secondary)}.round-counter{font-size:var(--text-md);font-weight:900;color:var(--accent)}.round-bar{height:8px;background:var(--bg-canvas);border-radius:4px;overflow:hidden;border:1px solid var(--ink-light)}.round-bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .3s var(--ease-out);width:0}
+    .round-complete{text-align:center;padding:var(--s-4)}.round-complete-icon{font-size:48px;margin-bottom:var(--s-2)}.round-complete-title{font-size:var(--text-xl);font-weight:900;color:var(--ink-primary);margin-bottom:var(--s-1)}.round-complete-stats{font-size:var(--text-md);font-weight:800;color:var(--ink-secondary)}
+    .db-stats{margin-top:var(--s-2);padding:var(--s-2);background:var(--bg-muted);border-radius:var(--radius-sm);font-size:var(--text-xs)}.db-stats h4{margin:0 0 var(--s-1);color:var(--accent);font-size:var(--text-sm)}.db-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px}.db-total{margin-top:var(--s-1);font-weight:900;color:var(--accent);border-top:1px solid var(--ink-light);padding-top:var(--s-1)}
+    @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:400px){header{padding:0 var(--s-2)}.viewport{padding:var(--s-2)}footer{padding:var(--s-2)}.brand-title{font-size:var(--text-lg)}.pill{padding:8px 10px;min-height:44px}.grade-btn{min-height:48px;font-size:var(--text-md)}.answer-btn{font-size:var(--text-sm);min-height:52px}.btn{min-height:48px;font-size:var(--text-sm)}.pattern-cell{width:36px;height:36px;font-size:16px}.pattern-cell.large{width:44px;height:44px;font-size:20px}}
+  </style>
+</head>
+<body>
+  <div class="app-frame">
+    <header>
+      <div class="brand">
+        <div class="brand-title">◆ Logik üben</div>
+        <div class="brand-subtitle">Kidsneed</div>
+      </div>
+      <div class="header-stats">
+        <div class="pill" id="stats-pill" role="button" tabindex="0"><span class="icon">✓</span><span class="val" id="score">0</span>/<span class="val" id="total">0</span></div>
+        <div class="pill"><span class="icon">🔥</span><span class="val" id="streak">0</span></div>
+      </div>
+    </header>
+    <main class="viewport">
+      <div class="card">
+        <section class="card-section">
+          <div class="section-label">Einstellungen</div>
+          <div class="controls-row">
+            <div class="control-group">
+              <label>Aufgabentyp</label>
+              <select id="task-type">
+                <option value="random">🎲 Zufällig</option>
+                <optgroup label="Muster & Reihen">
+                  <option value="numberPattern">Zahlenreihen</option>
+                  <option value="shapePattern">Formenreihen</option>
+                  <option value="colorPattern">Farbreihen</option>
+                  <option value="symbolPattern">Symbolreihen</option>
+                  <option value="matrixPattern">Matrix-Muster</option>
+                </optgroup>
+                <optgroup label="Kategorisieren">
+                  <option value="oddOneOut">Was passt nicht?</option>
+                  <option value="categorize">Einordnen</option>
+                  <option value="commonFeature">Gemeinsamkeit</option>
+                  <option value="analogies">Analogien</option>
+                </optgroup>
+                <optgroup label="Logisches Denken">
+                  <option value="ifThen">Wenn-Dann</option>
+                  <option value="syllogism">Schlussfolgerung</option>
+                  <option value="negation">Verneinung</option>
+                  <option value="truthTable">Wahr oder Falsch</option>
+                </optgroup>
+                <optgroup label="Räumliches Denken">
+                  <option value="rotation">Drehung</option>
+                  <option value="mirror">Spiegelung</option>
+                </optgroup>
+                <optgroup label="Problemlösen">
+                  <option value="codeBreaker">Code knacken</option>
+                  <option value="balance">Gleichgewicht</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Klassenstufe</label>
+              <div class="grade-grid" id="grades">
+                <button class="grade-btn" data-g="1" type="button">1</button>
+                <button class="grade-btn selected" data-g="2" type="button">2</button>
+                <button class="grade-btn" data-g="3" type="button">3</button>
+                <button class="grade-btn" data-g="4" type="button">4</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="card-section">
+          <div class="round-progress" id="round-progress" style="display:none">
+            <div class="round-info">
+              <span class="round-label">Runde</span>
+              <span class="round-counter" id="round-counter">1/6</span>
+            </div>
+            <div class="round-bar"><div class="round-bar-fill" id="round-bar-fill"></div></div>
+          </div>
+          <div class="task-area" id="task-area">
+            <div class="task-label" id="task-focus">Starte eine Aufgabe</div>
+            <div class="task-text" id="task-question">Wähle einen Aufgabentyp und klicke auf "Neue Aufgabe"</div>
+            <div id="task-visual"></div>
+          </div>
+          <div class="answers" id="answers"></div>
+          <div class="feedback" id="feedback"><span class="ficon">🎯</span><span>Wähle eine Klasse und starte.</span></div>
+          <div class="history-dots" id="history-dots"></div>
+        </section>
+        <section class="card-section">
+          <div class="actions">
+            <button class="btn" id="help-btn" disabled type="button">💡 Erklärung</button>
+            <button class="btn primary" id="start-btn" type="button">Neue Aufgabe</button>
+          </div>
+          <div class="actions" style="margin-top:var(--s-1)">
+            <button class="btn primary" id="start-round-btn" type="button">🎯 Runde starten</button>
+          </div>
+        </section>
+      </div>
+      <div class="db-stats" id="db-stats"></div>
+    </main>
+    <footer>
+      <a class="btn" href="https://humaneed.github.io/kidsneed/">← Hub</a>
+      <button class="btn" id="settings-btn" type="button">⚙️</button>
+      <button class="btn" id="stats-btn" type="button">📊</button>
+    </footer>
+    <div class="overlay" id="modal-help"><div class="sheet"><h2>💡 Erklärung</h2><div id="help-content"></div><div class="sheet-actions"><button class="btn primary" id="ok-help" type="button">Verstanden</button></div></div></div>
+    <div class="overlay" id="modal-settings"><div class="sheet"><h2>⚙️ Einstellungen</h2><p>Passe dein Übungserlebnis an.</p><div class="settings-group"><div class="setting-row"><span class="setting-label">Töne</span><div class="toggle on" id="toggle-sound" role="switch"></div></div><div class="setting-row"><span class="setting-label">Tastaturkürzel</span><div class="toggle on" id="toggle-keyboard" role="switch"></div></div></div><div class="sheet-actions"><button class="btn" id="reset-stats" type="button">🗑️ Reset</button><button class="btn primary" id="ok-settings" type="button">Fertig</button></div></div></div>
+    <div class="overlay" id="modal-stats"><div class="sheet"><h2>📊 Statistiken</h2><div id="stats-content"></div><div class="sheet-actions"><button class="btn primary" id="ok-stats" type="button">Schließen</button></div></div></div>
+    <div class="overlay" id="modal-round-complete"><div class="sheet"><div class="round-complete"><div class="round-complete-icon" id="round-complete-icon">🎉</div><div class="round-complete-title" id="round-complete-title">Runde geschafft!</div><div class="round-complete-stats" id="round-complete-stats"></div></div><div class="sheet-actions"><button class="btn" id="round-again-btn" type="button">🔄 Nochmal</button><button class="btn primary" id="round-done-btn" type="button">Fertig</button></div></div></div>
+  </div>
+<script>
+(function(){'use strict';
+const $=id=>document.getElementById(id);
+const Utils={
+  rnd:(a,b)=>Math.floor(Math.random()*(b-a+1))+a,
+  pick:a=>a[Math.floor(Math.random()*a.length)],
+  pickN:(a,n)=>Utils.shuffle(a).slice(0,n),
+  shuffle:a=>a.slice().sort(()=>Math.random()-.5),
+  unique:a=>[...new Set(a)],
+  range:(s,e)=>Array.from({length:e-s+1},(_,i)=>s+i)
+};
+
+// === STATE ===
+const state={grade:2,score:0,total:0,streak:0,maxStreak:0,currentTask:null,answered:false,history:[],settings:{sound:true,keyboard:true},
+  round:{active:false,tasks:[],currentIndex:0,correctCount:0,totalTasks:0}
+};
+
+// === AUDIO ===
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+const playBeep=(f,d,t='sine')=>{if(!state.settings.sound)return;if(audioCtx.state==='suspended')audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.01,audioCtx.currentTime+d);o.start();o.stop(audioCtx.currentTime+d)};
+const playCorrect=()=>{playBeep(523,.12);setTimeout(()=>playBeep(659,.15),100)};
+const playIncorrect=()=>playBeep(294,.2,'triangle');
+
+// === STORAGE ===
+const saveState=()=>{try{localStorage.setItem('kidsneed_logik',JSON.stringify({score:state.score,total:state.total,streak:state.streak,maxStreak:state.maxStreak,history:state.history.slice(-30),settings:state.settings,grade:state.grade}))}catch{}};
+const loadState=()=>{try{const s=JSON.parse(localStorage.getItem('kidsneed_logik'));if(s){Object.assign(state,{score:s.score||0,total:s.total||0,streak:s.streak||0,maxStreak:s.maxStreak||0,history:s.history||[],grade:s.grade||2});state.settings={...state.settings,...s.settings};document.querySelectorAll('.grade-btn').forEach(b=>b.classList.toggle('selected',+b.dataset.g===state.grade));$('toggle-sound').classList.toggle('on',state.settings.sound);$('toggle-keyboard').classList.toggle('on',state.settings.keyboard)}}catch{}};
+
+// ═══════════════════════════════════════════════════════════════════
+// DATABASE
+// ═══════════════════════════════════════════════════════════════════
+
+const SHAPES=['●','■','▲','◆','★','♥','○','□','△','◇'];
+const SHAPE_NAMES={
+  '●':'Kreis','■':'Quadrat','▲':'Dreieck','◆':'Raute','★':'Stern',
+  '♥':'Herz','○':'Ring','□':'Rahmen','△':'Dreieck','◇':'Raute'
+};
+
+const COLORS=[
+  {name:'Rot',emoji:'🔴',hex:'#C4726C'},
+  {name:'Blau',emoji:'🔵',hex:'#4A7C91'},
+  {name:'Grün',emoji:'🟢',hex:'#7BA08A'},
+  {name:'Gelb',emoji:'🟡',hex:'#D4A574'},
+  {name:'Lila',emoji:'🟣',hex:'#8B7BA0'},
+  {name:'Orange',emoji:'🟠',hex:'#D4A574'},
+  {name:'Braun',emoji:'🟤',hex:'#8B6B5C'},
+  {name:'Weiß',emoji:'⚪',hex:'#FFFFFF'}
+];
+
+const ANIMALS=['🐕','🐈','🐁','🐦','🐟','🐴','🐄','🐖','🐔','🦆','🐰','🐻','🦁','🐯','🐵'];
+const FRUITS=['🍎','🍐','🍊','🍋','🍇','🍓','🍌','🍑','🍒','🥝'];
+const WEATHER=['☀️','🌧️','❄️','🌈','⛈️','🌤️','☁️','🌪️'];
+const TRANSPORT=['🚗','🚌','🚂','✈️','🚢','🚲','🏍️','🚁'];
+const ARROWS=['→','↑','←','↓','↗','↘','↙','↖'];
+
+const CATEGORIES={
+  'Tiere':['Hund','Katze','Maus','Vogel','Fisch','Pferd','Kuh'],
+  'Pflanzen':['Baum','Blume','Gras','Busch','Rose','Tulpe','Kaktus'],
+  'Fahrzeuge':['Auto','Bus','Zug','Fahrrad','Schiff','Flugzeug','Motorrad'],
+  'Obst':['Apfel','Birne','Banane','Orange','Kirsche','Erdbeere','Traube'],
+  'Gemüse':['Gurke','Tomate','Karotte','Salat','Zwiebel','Kartoffel','Paprika'],
+  'Möbel':['Tisch','Stuhl','Schrank','Bett','Sofa','Regal','Kommode'],
+  'Kleidung':['Hose','Hemd','Jacke','Schuh','Mütze','Socke','Kleid'],
+  'Körperteile':['Kopf','Hand','Fuß','Arm','Bein','Auge','Ohr','Nase'],
+  'Wetter':['Sonne','Regen','Schnee','Wind','Gewitter','Nebel','Hagel'],
+  'Instrumente':['Gitarre','Klavier','Flöte','Trommel','Geige','Trompete'],
+  'Schule':['Stift','Heft','Buch','Tafel','Lineal','Schere','Ranzen'],
+  'Sport':['Fußball','Tennis','Schwimmen','Turnen','Laufen','Basketball'],
+  'Berufe':['Arzt','Lehrer','Bäcker','Polizist','Feuerwehr','Koch'],
+  'Formen':['Kreis','Quadrat','Dreieck','Rechteck','Stern','Herz']
+};
+
+const ANALOGIES={
+  1:[
+    {a:'Hund',b:'bellt',c:'Katze',d:'miaut',hint:'Tierlaute'},
+    {a:'Tag',b:'hell',c:'Nacht',d:'dunkel',hint:'Gegensätze'},
+    {a:'Vogel',b:'fliegt',c:'Fisch',d:'schwimmt',hint:'Fortbewegung'},
+    {a:'Auge',b:'sehen',c:'Ohr',d:'hören',hint:'Sinne'},
+    {a:'Apfel',b:'rot',c:'Banane',d:'gelb',hint:'Farben'}
+  ],
+  2:[
+    {a:'Schuh',b:'Fuß',c:'Handschuh',d:'Hand',hint:'Kleidung & Körperteil'},
+    {a:'Buch',b:'lesen',c:'Lied',d:'singen',hint:'Aktivitäten'},
+    {a:'Küche',b:'kochen',c:'Schlafzimmer',d:'schlafen',hint:'Räume & Aktivitäten'},
+    {a:'Winter',b:'kalt',c:'Sommer',d:'warm',hint:'Jahreszeiten'},
+    {a:'Bleistift',b:'schreiben',c:'Schere',d:'schneiden',hint:'Werkzeuge'}
+  ],
+  3:[
+    {a:'Autor',b:'Buch',c:'Maler',d:'Bild',hint:'Künstler & Werk'},
+    {a:'Wasser',b:'flüssig',c:'Eis',d:'fest',hint:'Aggregatzustände'},
+    {a:'Arzt',b:'Krankenhaus',c:'Lehrer',d:'Schule',hint:'Beruf & Arbeitsort'},
+    {a:'Stunde',b:'Minute',c:'Jahr',d:'Monat',hint:'Zeiteinheiten'},
+    {a:'Frage',b:'Antwort',c:'Problem',d:'Lösung',hint:'Zusammengehörigkeit'}
+  ],
+  4:[
+    {a:'Demokratie',b:'Volk',c:'Monarchie',d:'König',hint:'Herrschaftsformen'},
+    {a:'Addition',b:'Summe',c:'Multiplikation',d:'Produkt',hint:'Mathematik'},
+    {a:'Vergangenheit',b:'war',c:'Zukunft',d:'wird',hint:'Zeitformen'},
+    {a:'Hunger',b:'essen',c:'Durst',d:'trinken',hint:'Bedürfnisse'},
+    {a:'Ursache',b:'Wirkung',c:'Frage',d:'Antwort',hint:'Logische Paare'}
+  ]
+};
+
+const IF_THEN_RULES={
+  1:[
+    {rule:'Wenn es regnet, wird die Straße nass.',condition:'Es regnet.',result:'Die Straße ist nass.',wrong:['Die Sonne scheint.','Es ist trocken.']},
+    {rule:'Wenn die Ampel rot ist, muss man warten.',condition:'Die Ampel ist rot.',result:'Man muss warten.',wrong:['Man darf gehen.','Man kann fahren.']},
+    {rule:'Wenn man müde ist, geht man schlafen.',condition:'Tom ist müde.',result:'Tom geht schlafen.',wrong:['Tom geht spielen.','Tom ist wach.']}
+  ],
+  2:[
+    {rule:'Wenn es kalt ist, ziehe ich eine Jacke an.',condition:'Es ist kalt draußen.',result:'Ich ziehe eine Jacke an.',wrong:['Ich ziehe kurze Hosen an.','Ich gehe schwimmen.']},
+    {rule:'Wenn ich Hunger habe, esse ich etwas.',condition:'Lisa hat großen Hunger.',result:'Lisa isst etwas.',wrong:['Lisa geht schlafen.','Lisa macht Sport.']},
+    {rule:'Alle Vögel können fliegen. Ein Spatz ist ein Vogel.',condition:'Ein Spatz ist ein Vogel.',result:'Der Spatz kann fliegen.',wrong:['Der Spatz kann schwimmen.','Der Spatz ist ein Fisch.']}
+  ],
+  3:[
+    {rule:'Wenn heute Montag ist, ist morgen Dienstag.',condition:'Heute ist Montag.',result:'Morgen ist Dienstag.',wrong:['Morgen ist Sonntag.','Morgen ist Mittwoch.']},
+    {rule:'Wenn A größer als B ist und B größer als C, dann ist A größer als C.',condition:'Max ist größer als Tom. Tom ist größer als Lisa.',result:'Max ist größer als Lisa.',wrong:['Lisa ist größer als Max.','Alle sind gleich groß.']},
+    {rule:'Entweder ist es Tag oder Nacht.',condition:'Es ist nicht Tag.',result:'Es ist Nacht.',wrong:['Es ist Morgen.','Es ist Tag.']}
+  ],
+  4:[
+    {rule:'Wenn alle A auch B sind, und X ein A ist, dann ist X auch B.',condition:'Alle Säugetiere sind Wirbeltiere. Ein Hund ist ein Säugetier.',result:'Ein Hund ist ein Wirbeltier.',wrong:['Ein Hund ist kein Wirbeltier.','Wirbeltiere sind keine Säugetiere.']},
+    {rule:'Wenn nicht A, dann nicht B. Es gilt A.',condition:'Ohne Wasser kein Leben. Es gibt Wasser.',result:'Leben ist möglich.',wrong:['Leben ist unmöglich.','Es gibt kein Wasser.']},
+    {rule:'A impliziert B. B impliziert C. Also impliziert A auch C.',condition:'Regen macht nass. Nässe macht kalt.',result:'Regen macht kalt.',wrong:['Regen macht warm.','Kälte macht Regen.']}
+  ]
+};
+
+const TRUTH_STATEMENTS={
+  1:[
+    {s:'Die Sonne ist ein Stern.',a:true,e:'Die Sonne ist tatsächlich ein Stern.'},
+    {s:'Fische können fliegen.',a:false,e:'Fische leben im Wasser und können nicht fliegen.'},
+    {s:'Ein Tag hat 24 Stunden.',a:true,e:'Richtig, ein Tag hat genau 24 Stunden.'},
+    {s:'Äpfel wachsen unter der Erde.',a:false,e:'Äpfel wachsen an Bäumen, nicht unter der Erde.'},
+    {s:'Hunde können bellen.',a:true,e:'Ja, Bellen ist ein typisches Hundegeräusch.'}
+  ],
+  2:[
+    {s:'Wasser gefriert bei 0°C.',a:true,e:'Bei 0 Grad Celsius gefriert Wasser zu Eis.'},
+    {s:'Die Erde ist flach.',a:false,e:'Die Erde ist rund (eine Kugel).'},
+    {s:'Menschen brauchen Sauerstoff.',a:true,e:'Ohne Sauerstoff können Menschen nicht leben.'},
+    {s:'Alle Vögel können fliegen.',a:false,e:'Pinguine und Strauße sind Vögel, können aber nicht fliegen.'},
+    {s:'Februar hat immer 28 Tage.',a:false,e:'Im Schaltjahr hat Februar 29 Tage.'}
+  ],
+  3:[
+    {s:'Wenn es regnet, ist der Boden nass.',a:true,e:'Regen macht den Boden nass.'},
+    {s:'Alle geraden Zahlen sind durch 2 teilbar.',a:true,e:'Das ist die Definition von geraden Zahlen.'},
+    {s:'Ein Quadrat hat 5 Ecken.',a:false,e:'Ein Quadrat hat genau 4 Ecken.'},
+    {s:'Pflanzen brauchen Licht zum Wachsen.',a:true,e:'Ohne Licht können Pflanzen keine Photosynthese betreiben.'},
+    {s:'Alle Primzahlen sind ungerade.',a:false,e:'Die Zahl 2 ist eine gerade Primzahl.'}
+  ],
+  4:[
+    {s:'Wenn A=B und B=C, dann ist A=C.',a:true,e:'Das ist das Transitivitätsgesetz.'},
+    {s:'Die Summe zweier ungerader Zahlen ist immer ungerade.',a:false,e:'Die Summe ist immer gerade (z.B. 3+5=8).'},
+    {s:'Ein Dreieck kann drei rechte Winkel haben.',a:false,e:'Die Winkelsumme im Dreieck ist 180°, drei rechte Winkel wären 270°.'},
+    {s:'Schall breitet sich im Vakuum aus.',a:false,e:'Schall braucht ein Medium (Luft, Wasser) zur Ausbreitung.'},
+    {s:'Jede natürliche Zahl hat einen Nachfolger.',a:true,e:'Man kann zu jeder Zahl 1 addieren.'}
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// GENERATORS
+// ═══════════════════════════════════════════════════════════════════
+
+const Gen={
+  // MUSTER & REIHEN
+  numberPattern(lvl){
+    let seq,rule,ans;
+    if(lvl===1){
+      const start=Utils.rnd(1,5);
+      const step=Utils.rnd(1,3);
+      seq=Utils.range(0,4).map(i=>start+i*step);
+      ans=start+5*step;
+      rule=`+${step}`;
+    }else if(lvl===2){
+      const type=Utils.rnd(0,2);
+      if(type===0){
+        const start=Utils.rnd(1,10);
+        const step=Utils.rnd(2,5);
+        seq=Utils.range(0,4).map(i=>start+i*step);
+        ans=start+5*step;
+        rule=`+${step}`;
+      }else if(type===1){
+        const start=Utils.rnd(2,5);
+        seq=Utils.range(0,4).map(i=>start*(i+1));
+        ans=start*6;
+        rule=`×${start} (Einmaleins)`;
+      }else{
+        seq=[2,4,8,16,32];
+        ans=64;
+        rule='×2 (Verdoppeln)';
+      }
+    }else if(lvl===3){
+      const type=Utils.rnd(0,3);
+      if(type===0){
+        seq=[1,1,2,3,5];
+        ans=8;
+        rule='Fibonacci (Summe der zwei vorherigen)';
+      }else if(type===1){
+        seq=[1,4,9,16,25];
+        ans=36;
+        rule='Quadratzahlen';
+      }else if(type===2){
+        seq=[2,3,5,7,11];
+        ans=13;
+        rule='Primzahlen';
+      }else{
+        const start=Utils.rnd(1,5);
+        seq=[start,start+1,start+3,start+6,start+10];
+        ans=start+15;
+        rule='Dreieckszahlen (+1,+2,+3,...)';
+      }
+    }else{
+      const type=Utils.rnd(0,3);
+      if(type===0){
+        seq=[1,3,6,10,15];
+        ans=21;
+        rule='Dreieckszahlen';
+      }else if(type===1){
+        seq=[1,2,4,7,11];
+        ans=16;
+        rule='+1,+2,+3,+4,+5';
+      }else if(type===2){
+        seq=[2,6,12,20,30];
+        ans=42;
+        rule='n×(n+1)';
+      }else{
+        seq=[1,4,9,16,25];
+        ans=36;
+        rule='Quadratzahlen (n²)';
+      }
+    }
+    const wrong=[ans+Utils.rnd(1,3),ans-Utils.rnd(1,3),ans+Utils.rnd(4,8)].filter(w=>w>0&&w!==ans);
+    return{type:'numberPattern',q:'Welche Zahl kommt als nächstes?',a:ans,options:Utils.shuffle([ans,...wrong.slice(0,3)]),
+      visual:{type:'pattern',items:[...seq,'?']},explain:`Regel: ${rule}<br>Reihe: ${seq.join(', ')}, <b>${ans}</b>`,focus:'Zahlenreihen'};
+  },
+
+  shapePattern(lvl){
+    let pattern,seq,ans;
+    const shapes=Utils.pickN(SHAPES,3);
+    if(lvl<=2){
+      pattern=Utils.rnd(0,1)===0?[shapes[0],shapes[1]]:[shapes[0],shapes[1],shapes[0],shapes[1]];
+      seq=[...pattern,...pattern].slice(0,5);
+      ans=pattern[seq.length%pattern.length];
+    }else{
+      pattern=Utils.rnd(0,1)===0?[shapes[0],shapes[1],shapes[2]]:[shapes[0],shapes[0],shapes[1]];
+      seq=[...pattern,...pattern].slice(0,5);
+      ans=pattern[seq.length%pattern.length];
+    }
+    const wrong=shapes.filter(s=>s!==ans);
+    return{type:'shapePattern',q:'Welche Form kommt als nächstes?',a:ans,options:Utils.shuffle([ans,...wrong.slice(0,2)]),
+      visual:{type:'pattern',items:[...seq,'?']},explain:`Muster: ${pattern.join(' ')} wiederholt sich.`,focus:'Formenreihen'};
+  },
+
+  colorPattern(lvl){
+    const colors=Utils.pickN(COLORS,3);
+    let pattern,seq,ans;
+    if(lvl<=2){
+      pattern=[colors[0].emoji,colors[1].emoji];
+      seq=[...pattern,...pattern,...pattern].slice(0,5);
+      ans=pattern[seq.length%pattern.length];
+    }else{
+      pattern=[colors[0].emoji,colors[1].emoji,colors[2].emoji];
+      seq=[...pattern,...pattern].slice(0,5);
+      ans=pattern[seq.length%pattern.length];
+    }
+    const wrong=colors.map(c=>c.emoji).filter(e=>e!==ans);
+    return{type:'colorPattern',q:'Welche Farbe kommt als nächstes?',a:ans,options:Utils.shuffle([ans,...wrong.slice(0,2)]),
+      visual:{type:'pattern',items:[...seq,'?']},explain:`Muster: ${pattern.join(' ')} wiederholt sich.`,focus:'Farbreihen'};
+  },
+
+  symbolPattern(lvl){
+    const symbols=lvl<=2?Utils.pickN(ANIMALS,3):Utils.pickN([...ANIMALS,...FRUITS,...WEATHER],4);
+    let pattern,seq,ans;
+    if(lvl<=2){
+      pattern=[symbols[0],symbols[1]];
+      seq=[...pattern,...pattern,...pattern].slice(0,5);
+      ans=pattern[seq.length%pattern.length];
+    }else{
+      pattern=[symbols[0],symbols[1],symbols[2]];
+      seq=[...pattern,...pattern].slice(0,5);
+      ans=pattern[seq.length%pattern.length];
+    }
+    const wrong=symbols.filter(s=>s!==ans);
+    return{type:'symbolPattern',q:'Welches Symbol kommt als nächstes?',a:ans,options:Utils.shuffle([ans,...wrong.slice(0,2)]),
+      visual:{type:'pattern',items:[...seq,'?']},explain:`Muster: ${pattern.join(' ')} wiederholt sich.`,focus:'Symbolreihen'};
+  },
+
+  matrixPattern(lvl){
+    const size=lvl<=2?2:3;
+    const symbols=Utils.pickN(SHAPES,size);
+    const grid=[];
+    for(let r=0;r<size;r++){
+      const row=Utils.shuffle([...symbols]);
+      grid.push(row);
+    }
+    const missingR=Utils.rnd(0,size-1);
+    const missingC=Utils.rnd(0,size-1);
+    const ans=grid[missingR][missingC];
+    grid[missingR][missingC]='?';
+    const wrong=symbols.filter(s=>s!==ans);
+    return{type:'matrixPattern',q:'Welches Symbol fehlt?',a:ans,options:Utils.shuffle([ans,...wrong]),
+      visual:{type:'matrix',grid,size},explain:`Jede Zeile und Spalte enthält jedes Symbol genau einmal.`,focus:'Matrix-Muster'};
+  },
+
+  // KATEGORISIEREN
+  oddOneOut(lvl){
+    const catNames=Object.keys(CATEGORIES);
+    const cat1=Utils.pick(catNames);
+    let cat2;
+    do{cat2=Utils.pick(catNames)}while(cat2===cat1);
+    const items=Utils.pickN(CATEGORIES[cat1],3);
+    const odd=Utils.pick(CATEGORIES[cat2]);
+    const all=Utils.shuffle([...items,odd]);
+    return{type:'oddOneOut',q:'Was passt nicht zu den anderen?',a:odd,options:all,
+      explain:`<b>${odd}</b> gehört zu "${cat2}".<br>Die anderen gehören zu "${cat1}".`,focus:'Was passt nicht?'};
+  },
+
+  categorize(lvl){
+    const catNames=Object.keys(CATEGORIES);
+    const cat=Utils.pick(catNames);
+    const correct=Utils.pick(CATEGORIES[cat]);
+    let wrongCat;
+    do{wrongCat=Utils.pick(catNames)}while(wrongCat===cat);
+    const wrongItems=Utils.pickN(CATEGORIES[wrongCat],2);
+    return{type:'categorize',q:`Welches Wort gehört zu "${cat}"?`,a:correct,options:Utils.shuffle([correct,...wrongItems]),
+      explain:`<b>${correct}</b> ist ein ${cat}.`,focus:'Einordnen'};
+  },
+
+  commonFeature(lvl){
+    const catNames=Object.keys(CATEGORIES);
+    const cat=Utils.pick(catNames);
+    const items=Utils.pickN(CATEGORIES[cat],3);
+    let wrongCat;
+    do{wrongCat=Utils.pick(catNames)}while(wrongCat===cat);
+    const wrongAns=wrongCat;
+    return{type:'commonFeature',q:`Was haben diese gemeinsam?\n\n${items.join(', ')}`,a:cat,options:Utils.shuffle([cat,wrongCat,Utils.pick(catNames.filter(c=>c!==cat&&c!==wrongCat))]),
+      explain:`Alle drei sind <b>${cat}</b>.`,focus:'Gemeinsamkeit'};
+  },
+
+  analogies(lvl){
+    const analogySet=ANALOGIES[Math.min(lvl,4)]||ANALOGIES[2];
+    const an=Utils.pick(analogySet);
+    const wrong=[...Object.values(CATEGORIES).flat().slice(0,10)].filter(w=>w!==an.d);
+    return{type:'analogies',q:`${an.a} : ${an.b} = ${an.c} : ?`,a:an.d,options:Utils.shuffle([an.d,...Utils.pickN(wrong,2)]),
+      explain:`<b>${an.a}</b> verhält sich zu <b>${an.b}</b> wie <b>${an.c}</b> zu <b>${an.d}</b>.<br>Hinweis: ${an.hint}`,focus:'Analogien'};
+  },
+
+  // LOGISCHES DENKEN
+  ifThen(lvl){
+    const rules=IF_THEN_RULES[Math.min(lvl,4)]||IF_THEN_RULES[2];
+    const r=Utils.pick(rules);
+    return{type:'ifThen',q:`Regel: "${r.rule}"\n\n${r.condition}\n\nWas folgt daraus?`,a:r.result,options:Utils.shuffle([r.result,...r.wrong]),
+      visual:{type:'logic',premise:r.rule,condition:r.condition},explain:`Aus der Regel folgt: <b>${r.result}</b>`,focus:'Wenn-Dann'};
+  },
+
+  syllogism(lvl){
+    const syllogisms=[
+      {p1:'Alle Hunde sind Tiere.',p2:'Bello ist ein Hund.',c:'Bello ist ein Tier.',wrong:['Bello ist kein Tier.','Alle Tiere sind Hunde.']},
+      {p1:'Alle Vögel haben Federn.',p2:'Ein Adler ist ein Vogel.',c:'Ein Adler hat Federn.',wrong:['Ein Adler hat keine Federn.','Alle Tiere mit Federn sind Adler.']},
+      {p1:'Kein Fisch kann fliegen.',p2:'Ein Lachs ist ein Fisch.',c:'Ein Lachs kann nicht fliegen.',wrong:['Ein Lachs kann fliegen.','Alle Tiere können fliegen.']},
+      {p1:'Alle Quadrate sind Rechtecke.',p2:'Diese Form ist ein Quadrat.',c:'Diese Form ist ein Rechteck.',wrong:['Diese Form ist kein Rechteck.','Alle Rechtecke sind Quadrate.']}
+    ];
+    const s=Utils.pick(syllogisms.slice(0,lvl+1));
+    return{type:'syllogism',q:`${s.p1}\n${s.p2}\n\nWas können wir schlussfolgern?`,a:s.c,options:Utils.shuffle([s.c,...s.wrong]),
+      visual:{type:'logic',premise:s.p1,condition:s.p2},explain:`Aus den beiden Aussagen folgt logisch: <b>${s.c}</b>`,focus:'Schlussfolgerung'};
+  },
+
+  negation(lvl){
+    const statements=[
+      {s:'Der Ball ist rot.',n:'Der Ball ist nicht rot.',wrong:['Der Ball ist blau.','Es gibt keinen Ball.']},
+      {s:'Alle Kinder spielen.',n:'Nicht alle Kinder spielen.',wrong:['Kein Kind spielt.','Alle spielen.']},
+      {s:'Es regnet immer.',n:'Es regnet nicht immer.',wrong:['Es regnet nie.','Es schneit.']},
+      {s:'Jeder Schüler hat ein Buch.',n:'Nicht jeder Schüler hat ein Buch.',wrong:['Kein Schüler hat ein Buch.','Alle haben zwei Bücher.']}
+    ];
+    const st=Utils.pick(statements.slice(0,Math.min(lvl+1,4)));
+    return{type:'negation',q:`Was ist die Verneinung von:\n\n"${st.s}"`,a:st.n,options:Utils.shuffle([st.n,...st.wrong]),
+      explain:`Die logische Verneinung ist: <b>${st.n}</b>`,focus:'Verneinung'};
+  },
+
+  truthTable(lvl){
+    const statements=TRUTH_STATEMENTS[Math.min(lvl,4)]||TRUTH_STATEMENTS[2];
+    const st=Utils.pick(statements);
+    return{type:'truthTable',q:`Wahr oder falsch?\n\n"${st.s}"`,a:st.a?'Wahr':'Falsch',options:['Wahr','Falsch'],
+      explain:`${st.a?'✓ Wahr':'✗ Falsch'}: ${st.e}`,focus:'Wahr oder Falsch'};
+  },
+
+  // RÄUMLICHES DENKEN
+  rotation(lvl){
+    const arrows=['→','↑','←','↓'];
+    const startIdx=Utils.rnd(0,3);
+    const rotation=Utils.pick([1,2,3]); // 90°, 180°, 270°
+    const endIdx=(startIdx+rotation)%4;
+    const degrees=rotation*90;
+    const wrong=arrows.filter((_,i)=>i!==endIdx);
+    return{type:'rotation',q:`Drehe ${arrows[startIdx]} um ${degrees}° im Uhrzeigersinn.\n\nWas kommt heraus?`,a:arrows[endIdx],options:Utils.shuffle([arrows[endIdx],...wrong.slice(0,2)]),
+      visual:{type:'pattern',items:[arrows[startIdx],'→',`${degrees}°`]},explain:`${arrows[startIdx]} gedreht um ${degrees}° ergibt <b>${arrows[endIdx]}</b>`,focus:'Drehung'};
+  },
+
+  mirror(lvl){
+    const pairs=[
+      {orig:'◀',mirror:'▶',axis:'vertikal'},
+      {orig:'▲',mirror:'▼',axis:'horizontal'},
+      {orig:'↗',mirror:'↘',axis:'horizontal'},
+      {orig:'↖',mirror:'↗',axis:'vertikal'},
+      {orig:'🅿️',mirror:'🅿️',axis:'vertikal'},
+      {orig:'d',mirror:'b',axis:'vertikal'},
+      {orig:'p',mirror:'q',axis:'vertikal'}
+    ];
+    const p=Utils.pick(pairs.slice(0,lvl<=2?3:7));
+    const allSymbols=['◀','▶','▲','▼','↗','↘','↖','↙'];
+    const wrong=allSymbols.filter(s=>s!==p.mirror);
+    return{type:'mirror',q:`Spiegele ${p.orig} ${p.axis}.\n\nWas kommt heraus?`,a:p.mirror,options:Utils.shuffle([p.mirror,...Utils.pickN(wrong,2)]),
+      explain:`${p.orig} gespiegelt (${p.axis}) ergibt <b>${p.mirror}</b>`,focus:'Spiegelung'};
+  },
+
+  // PROBLEMLÖSEN
+  codeBreaker(lvl){
+    let code,pattern,ans,hint;
+    if(lvl<=2){
+      code='ABC';
+      pattern='A=1, B=2, C=3';
+      const letter=Utils.pick(['D','E','F']);
+      ans=letter.charCodeAt(0)-64;
+      hint=`${letter} = ?`;
+    }else{
+      const type=Utils.rnd(0,1);
+      if(type===0){
+        code='2→4, 3→6, 4→8';
+        pattern='×2';
+        const num=Utils.rnd(5,9);
+        ans=num*2;
+        hint=`${num} → ?`;
+      }else{
+        code='1→1, 2→4, 3→9';
+        pattern='Quadratzahlen';
+        const num=Utils.rnd(4,6);
+        ans=num*num;
+        hint=`${num} → ?`;
+      }
+    }
+    const wrong=[ans+1,ans-1,ans+2].filter(w=>w>0&&w!==ans);
+    return{type:'codeBreaker',q:`Code: ${code}\n\n${hint}`,a:String(ans),options:Utils.shuffle([String(ans),...wrong.map(String).slice(0,2)]),
+      explain:`Muster: ${pattern}<br>Antwort: <b>${ans}</b>`,focus:'Code knacken'};
+  },
+
+  balance(lvl){
+    let eq,ans,wrong;
+    if(lvl<=2){
+      const a=Utils.rnd(1,5);
+      const b=Utils.rnd(1,5);
+      ans=a+b;
+      eq=`${a} + ${b} = ?`;
+      wrong=[ans+1,ans-1,ans+2];
+    }else{
+      const a=Utils.rnd(2,6);
+      const b=Utils.rnd(2,6);
+      const c=Utils.rnd(1,5);
+      ans=a*b-c;
+      eq=`${a} × ${b} - ${c} = ?`;
+      wrong=[ans+1,ans-1,ans+a];
+    }
+    wrong=wrong.filter(w=>w>0&&w!==ans);
+    return{type:'balance',q:`Löse die Gleichung:\n\n${eq}`,a:String(ans),options:Utils.shuffle([String(ans),...wrong.map(String).slice(0,2)]),
+      explain:`${eq.replace('?',ans)}`,focus:'Gleichgewicht'};
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// MASTER GENERATOR
+// ═══════════════════════════════════════════════════════════════════
+
+const MasterGen={
+  types:Object.keys(Gen),
+  generate(type,lvl){return Gen[type](lvl)},
+  random(lvl){
+    let types;
+    if(lvl===1)types=['numberPattern','shapePattern','colorPattern','oddOneOut','categorize','truthTable'];
+    else if(lvl===2)types=['numberPattern','shapePattern','symbolPattern','oddOneOut','categorize','commonFeature','analogies','ifThen','truthTable','rotation'];
+    else if(lvl===3)types=['numberPattern','shapePattern','matrixPattern','oddOneOut','analogies','ifThen','syllogism','negation','rotation','mirror','codeBreaker','balance'];
+    else types=this.types;
+    return this.generate(Utils.pick(types),lvl);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════════════════════
+
+const updateStats=()=>{$('score').textContent=state.score;$('total').textContent=state.total;$('streak').textContent=state.streak};
+const updateHistoryDots=()=>{$('history-dots').innerHTML=state.history.slice(-10).map(h=>`<div class="dot ${h.correct?'correct':'incorrect'}">${h.correct?'✓':'✗'}</div>`).join('')};
+const showFeedback=(text,type='')=>{const fb=$('feedback');fb.className='feedback'+(type?' '+type:'');fb.innerHTML=`<span class="ficon">${type==='success'?'✅':type==='error'?'❌':'🎯'}</span><span>${text}</span>`};
+
+const renderVisual=(visual)=>{
+  const container=$('task-visual');
+  if(!visual){container.innerHTML='';return}
+  
+  if(visual.type==='pattern'){
+    container.innerHTML=`<div class="pattern-row">${visual.items.map(item=>
+      `<div class="pattern-cell${item==='?'?' question':''}">${item}</div>`
+    ).join('')}</div>`;
+  }else if(visual.type==='matrix'){
+    const cols=visual.size;
+    container.innerHTML=`<div class="matrix-grid" style="grid-template-columns:repeat(${cols},1fr)">${
+      visual.grid.flat().map(cell=>`<div class="matrix-cell${cell==='?'?' question':''}">${cell}</div>`).join('')
+    }</div>`;
+  }else if(visual.type==='logic'){
+    container.innerHTML=`<div class="logic-card premise">📜 ${visual.premise}</div>${visual.condition?`<div class="logic-card conclusion">❓ ${visual.condition}</div>`:''}`;
+  }else{
+    container.innerHTML='';
+  }
+};
+
+const openModal=id=>$(id).classList.add('open');
+const closeModal=id=>$(id).classList.remove('open');
+
+const showStatsModal=()=>{
+  const acc=state.total>0?Math.round((state.score/state.total)*100):0;
+  $('stats-content').innerHTML=`<div class="stats-grid"><div class="stat-card"><div class="stat-card-value">${state.total}</div><div class="stat-card-label">Aufgaben</div></div><div class="stat-card"><div class="stat-card-value">${state.score}</div><div class="stat-card-label">Richtig</div></div><div class="stat-card"><div class="stat-card-value">${acc}%</div><div class="stat-card-label">Genauigkeit</div></div><div class="stat-card"><div class="stat-card-value">${state.maxStreak}</div><div class="stat-card-label">Beste Serie</div></div></div>`;
+  openModal('modal-stats');
+};
+
+const showDBStats=()=>{
+  const counts={
+    'Zahlenreihen':30,'Formenreihen':20,'Farbreihen':15,'Symbolreihen':20,'Matrix':15,
+    'Was passt nicht?':Object.keys(CATEGORIES).length*7,'Einordnen':50,'Gemeinsamkeit':40,'Analogien':20,
+    'Wenn-Dann':15,'Schlussfolgerung':4,'Verneinung':4,'Wahr/Falsch':20,
+    'Drehung':12,'Spiegelung':7,'Code knacken':10,'Gleichgewicht':20
+  };
+  const total=Object.values(counts).reduce((a,b)=>a+b,0);
+  let html='<h4>📊 Aufgaben-Datenbank</h4><div class="db-grid">';
+  for(const [k,v] of Object.entries(counts))html+=`<div>${k}:</div><div><b>${v}+</b></div>`;
+  html+=`</div><div class="db-total">Gesamt: ${total}+ Varianten</div>`;
+  $('db-stats').innerHTML=html;
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ROUND SYSTEM
+// ═══════════════════════════════════════════════════════════════════
+
+const getRoundSize=()=>state.grade*6;
+
+const updateRoundProgress=()=>{
+  if(!state.round.active)return;
+  const total=state.round.totalTasks;
+  const current=state.round.currentIndex+1;
+  $('round-counter').textContent=`${current}/${total}`;
+  $('round-bar-fill').style.width=`${(current/total)*100}%`;
+};
+
+const generateRoundTasks=()=>{
+  const type=$('task-type').value;
+  const count=getRoundSize();
+  const tasks=[];
+  for(let i=0;i<count;i++){
+    try{
+      const task=type==='random'?MasterGen.random(state.grade):MasterGen.generate(type,state.grade);
+      tasks.push(task);
+    }catch(e){console.error('Task error:',e)}
+  }
+  return tasks;
+};
+
+const startRound=()=>{
+  const tasks=generateRoundTasks();
+  if(tasks.length===0){showFeedback('Fehler beim Erstellen der Aufgaben','error');return}
+  state.round={active:true,tasks,currentIndex:0,correctCount:0,totalTasks:tasks.length};
+  $('round-progress').style.display='block';
+  $('start-btn').style.display='none';
+  $('start-round-btn').textContent='⏹️ Runde beenden';
+  updateRoundProgress();
+  showRoundTask();
+};
+
+const stopRound=()=>{
+  state.round.active=false;
+  $('round-progress').style.display='none';
+  $('start-btn').style.display='';
+  $('start-round-btn').textContent='🎯 Runde starten';
+  $('task-focus').textContent='Starte eine Aufgabe';
+  $('task-question').textContent='Wähle einen Aufgabentyp und klicke auf "Neue Aufgabe"';
+  $('task-visual').innerHTML='';
+  $('answers').innerHTML='';
+  showFeedback('Wähle eine Klasse und starte.');
+};
+
+const showRoundTask=()=>{
+  if(state.round.currentIndex>=state.round.totalTasks){finishRound();return}
+  const task=state.round.tasks[state.round.currentIndex];
+  state.currentTask=task;
+  state.answered=false;
+  render(task);
+  updateRoundProgress();
+};
+
+const finishRound=()=>{
+  state.round.active=false;
+  const correct=state.round.correctCount;
+  const total=state.round.totalTasks;
+  const percent=Math.round((correct/total)*100);
+  let icon='🎉',title='Runde geschafft!';
+  if(percent>=90){icon='🏆';title='Ausgezeichnet!';}
+  else if(percent>=70){icon='⭐';title='Sehr gut!';}
+  else if(percent>=50){icon='👍';title='Gut gemacht!';}
+  else{icon='💪';title='Weiter üben!';}
+  $('round-complete-icon').textContent=icon;
+  $('round-complete-title').textContent=title;
+  $('round-complete-stats').innerHTML=`${correct} von ${total} richtig (${percent}%)`;
+  $('round-progress').style.display='none';
+  $('start-btn').style.display='';
+  $('start-round-btn').textContent='🎯 Runde starten';
+  openModal('modal-round-complete');
+};
+
+const nextRoundTask=()=>{
+  state.round.currentIndex++;
+  if(state.round.currentIndex>=state.round.totalTasks){finishRound()}
+  else{setTimeout(showRoundTask,600)}
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// TASK RENDERING & ANSWERING
+// ═══════════════════════════════════════════════════════════════════
+
+const render=task=>{
+  state.currentTask=task;
+  state.answered=false;
+  $('task-focus').textContent=task.focus;
+  $('task-question').textContent=task.q;
+  $('help-btn').disabled=false;
+  renderVisual(task.visual);
+  showFeedback(state.round.active?`Aufgabe ${state.round.currentIndex+1} von ${state.round.totalTasks}`:'Tippe auf die richtige Lösung');
+  
+  const ansClass=task.options.length===2?'answers':'answers';
+  $('answers').className=ansClass;
+  $('answers').innerHTML=task.options.map(o=>`<button class="answer-btn" data-v="${o}">${o}</button>`).join('');
+};
+
+const handleAnswer=(btn,val)=>{
+  if(state.answered)return;
+  state.answered=true;
+  state.total++;
+  const ok=String(val)===String(state.currentTask.a);
+  
+  if(ok){
+    state.score++;
+    state.streak++;
+    if(state.streak>state.maxStreak)state.maxStreak=state.streak;
+    if(state.round.active)state.round.correctCount++;
+    btn.classList.add('correct');
+    showFeedback('Richtig! Super gemacht! 🎉','success');
+    playCorrect();
+  }else{
+    state.streak=0;
+    btn.classList.add('incorrect');
+    document.querySelectorAll('.answer-btn').forEach(b=>{
+      if(String(b.dataset.v)===String(state.currentTask.a))b.classList.add('correct');
+    });
+    showFeedback(`Fast! Die Antwort ist: ${state.currentTask.a}`,'error');
+    playIncorrect();
+  }
+  
+  document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);
+  state.history.push({correct:ok});
+  updateStats();
+  updateHistoryDots();
+  saveState();
+  
+  if(state.round.active){
+    setTimeout(nextRoundTask,1200);
+  }
+};
+
+const newTask=()=>{
+  const type=$('task-type').value;
+  try{
+    render(type==='random'?MasterGen.random(state.grade):MasterGen.generate(type,state.grade));
+  }catch(e){
+    $('task-question').textContent='Fehler: '+e.message;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════════════
+
+$('grades').onclick=e=>{
+  const btn=e.target.closest('.grade-btn');
+  if(!btn)return;
+  state.grade=+btn.dataset.g;
+  document.querySelectorAll('.grade-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if(state.round.active)stopRound();
+  saveState();
+};
+
+$('start-btn').onclick=newTask;
+$('start-round-btn').onclick=()=>{if(state.round.active){stopRound()}else{startRound()}};
+$('help-btn').onclick=()=>{
+  if(!state.currentTask)return;
+  $('help-content').innerHTML=`<div class="explain-box"><div class="explain-title">💡 Erklärung</div>${state.currentTask.explain}<div class="explain-result">Antwort: ${state.currentTask.a}</div></div>`;
+  openModal('modal-help');
+};
+
+$('stats-btn').onclick=showStatsModal;
+$('stats-pill').onclick=showStatsModal;
+$('settings-btn').onclick=()=>openModal('modal-settings');
+
+$('toggle-sound').onclick=()=>{state.settings.sound=!state.settings.sound;$('toggle-sound').classList.toggle('on');saveState()};
+$('toggle-keyboard').onclick=()=>{state.settings.keyboard=!state.settings.keyboard;$('toggle-keyboard').classList.toggle('on');saveState()};
+$('reset-stats').onclick=()=>{if(!confirm('Wirklich alle Statistiken zurücksetzen?'))return;state.score=0;state.total=0;state.streak=0;state.maxStreak=0;state.history=[];updateStats();updateHistoryDots();saveState();closeModal('modal-settings')};
+
+$('round-again-btn').onclick=()=>{closeModal('modal-round-complete');startRound()};
+$('round-done-btn').onclick=()=>{closeModal('modal-round-complete');stopRound()};
+
+['help','settings','stats','round-complete'].forEach(n=>{
+  const okBtn=$(`ok-${n}`);
+  if(okBtn)okBtn.onclick=()=>closeModal(`modal-${n}`);
+  $(`modal-${n}`).onclick=e=>{if(e.target===$(`modal-${n}`))closeModal(`modal-${n}`)};
+});
+
+$('answers').onclick=e=>{const b=e.target.closest('.answer-btn');if(b&&!b.disabled)handleAnswer(b,b.dataset.v)};
+
+document.onkeydown=e=>{
+  if(!state.settings.keyboard)return;
+  if(e.key==='Escape'){['help','settings','stats','round-complete'].forEach(n=>closeModal(`modal-${n}`));return}
+  if(document.querySelector('.overlay.open'))return;
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!state.round.active)$('start-btn').click()}
+  else if('1234'.includes(e.key)){const btn=document.querySelectorAll('.answer-btn')[+e.key-1];if(btn&&!btn.disabled)btn.click()}
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+
+loadState();
+updateStats();
+updateHistoryDots();
+showDBStats();
+console.log('✅ Logik üben geladen.');
+})();
+</script>
+</body>
+</html>
